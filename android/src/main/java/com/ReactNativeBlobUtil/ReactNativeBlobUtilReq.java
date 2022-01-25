@@ -311,8 +311,9 @@ public class ReactNativeBlobUtilReq extends BroadcastReceiver implements Runnabl
                         else if (value.equalsIgnoreCase("utf8"))
                             responseFormat = ResponseFormat.UTF8;
                     } else {
-                        builder.header(key.toLowerCase(), value);
-                        mheaders.put(key.toLowerCase(), value);
+                        temp_key=key.replace("I","i").toLowerCase(); //to prevent dotless i problem on android with turkish locale (https://github.com/joltup/rn-fetch-blob/pull/762)
+                        builder.header(temp_key, value);
+                        mheaders.put(temp_key, value);
                     }
                 }
             }
