@@ -300,8 +300,8 @@ public class RNFetchBlobReq extends BroadcastReceiver implements Runnable {
                             responseFormat = ResponseFormat.UTF8;
                     }
                     else {
-                        builder.header(key.toLowerCase(), value);
-                        mheaders.put(key.toLowerCase(), value);
+                        builder.header(key.toLowerCase().replace("ı","i"), value);
+                        mheaders.put(key.toLowerCase().replace("ı","i"), value);
                     }
                 }
             }
