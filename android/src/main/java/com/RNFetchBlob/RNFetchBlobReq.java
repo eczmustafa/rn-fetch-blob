@@ -49,6 +49,7 @@ import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.HashMap;
 
 import java.util.concurrent.TimeUnit;
@@ -115,6 +116,7 @@ public class RNFetchBlobReq extends BroadcastReceiver implements Runnable {
     boolean timeout = false;
     ArrayList<String> redirects = new ArrayList<>();
     OkHttpClient client;
+    Locale httpHeaderLocale = Locale.ENGLISH;
 
     public RNFetchBlobReq(ReadableMap options, String taskId, String method, String url, ReadableMap headers, String body, ReadableArray arrayBody, OkHttpClient client, final Callback callback) {
         this.method = method.toUpperCase();
@@ -300,14 +302,14 @@ public class RNFetchBlobReq extends BroadcastReceiver implements Runnable {
                             responseFormat = ResponseFormat.UTF8;
                     }
                     else {
-                        builder.header(key.toLowerCase(), value);
-                        mheaders.put(key.toLowerCase(), value);
+                        builder.header(key.toLowerCase(httpHeaderLocale), value);
+                        mheaders.put(key.toLowerCase(httpHeaderLocale), value);
                     }
                 }
             }
 
             if(method.equalsIgnoreCase("post") || method.equalsIgnoreCase("put") || method.equalsIgnoreCase("patch")) {
-                String cType = getHeaderIgnoreCases(mheaders, "Content-Type").toLowerCase();
+                String cType = getHeaderIgnoreCases(mheaders, "Content-Type").toLowerCase(httpHeaderLocale);
 
                 if(rawRequestBodyArray != null) {
                     requestType = RequestType.Form;
@@ -323,7 +325,7 @@ public class RNFetchBlobReq extends BroadcastReceiver implements Runnable {
                             || rawRequestBody.startsWith(RNFetchBlobConst.CONTENT_PREFIX)) {
                         requestType = RequestType.SingleFile;
                     }
-                    else if (cType.toLowerCase().contains(";base64") || cType.toLowerCase().startsWith("application/octet")) {
+                    else if (cType.toLowerCase().contains(";base64") || cType.toLowerCase(httpHeaderLocale).startsWith("application/octet")) {
                         cType = cType.replace(";base64","").replace(";BASE64","");
                         if(mheaders.containsKey("content-type"))
                             mheaders.put("content-type", cType);
@@ -717,7 +719,7 @@ public class RNFetchBlobReq extends BroadcastReceiver implements Runnable {
         boolean isCustomBinary = false;
         if(options.binaryContentTypes != null) {
             for(int i = 0; i< options.binaryContentTypes.size();i++) {
-                if(ctype.toLowerCase().contains(options.binaryContentTypes.getString(i).toLowerCase())) {
+                if(ctype.toLowerCase(httpHeaderLocale).contains(options.binaryContentTypes.getString(i).toLowerCase())) {
                     isCustomBinary = true;
                     break;
                 }
@@ -729,13 +731,13 @@ public class RNFetchBlobReq extends BroadcastReceiver implements Runnable {
     private String getHeaderIgnoreCases(Headers headers, String field) {
         String val = headers.get(field);
         if(val != null) return val;
-        return headers.get(field.toLowerCase()) == null ? "" : headers.get(field.toLowerCase());
+        return headers.get(field.toLowerCase(httpHeaderLocale)) == null ? "" : headers.get(field.toLowerCase(Locale.English));
     }
 
     private String getHeaderIgnoreCases(HashMap<String,String> headers, String field) {
         String val = headers.get(field);
         if(val != null) return val;
-        String lowerCasedValue = headers.get(field.toLowerCase());
+        String lowerCasedValue = headers.get(field.toLowerCase(httpHeaderLocale));
         return lowerCasedValue == null ? "" : lowerCasedValue;
     }
 
